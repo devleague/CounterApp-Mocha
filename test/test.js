@@ -87,4 +87,28 @@ describe('Counter App', () => {
 
   });
 
+  describe('GET /api/counters/1/decrement', () => {
+
+    let currentCount;
+    let response;
+
+    beforeEach((setup) => {
+      currentCount = null;
+      agent.get('/api/counters/1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && ( currentCount = res.body.count ) )
+        .end(setup);
+    });
+
+    it('should decrement the counter count value by one', (done)=>{
+      agent.get('/api/counters/1/decrement')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && res.body.count.should.equal( currentCount - 1 ) )
+        .end(done);
+    });
+
+  });
+
 });
