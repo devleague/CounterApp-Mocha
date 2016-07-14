@@ -111,4 +111,38 @@ describe('Counter App', () => {
 
   });
 
+  describe('PUT /api/counters/1', (should) => {
+
+    let currentCount;
+
+    beforeEach((setup) => {
+      currentCount = null;
+      agent.get('/api/counters/1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && ( currentCount = res.body.count ) )
+        .end(setup);
+    });
+
+    it('should update the value and return the updated counter', (done)=>{
+
+      let payload = {
+        count : 99
+      };
+
+      agent.put('/api/counters/1')
+        .send(payload)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && res.body.should.deepEqual( payload ) )
+        .end(() => {
+          agent.get('/api/counters/1')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect(res => res.body.hasOwnProperty('count') && ( res.body.count.should.equal( payload.count ) ) )
+            .end(done);
+        });
+    });
+  });
+
 });
