@@ -1,23 +1,54 @@
 'use strict';
 
-const express = require('express');
-const router = express.Router();
-const bodyParser = require('body-parser');
-const ds = require('../dataStore');
+const data = {
+  1 : { count : 1 }
+};
 
-router.use(bodyParser.json());
+function getById( id ){
+  return data[id];
+}
 
-router.get('/', (req, res) => res.json(ds.data));
+function incrementById( id ){
+  let counter = getById(id);
+  counter.count++;
+  return counter;
+}
 
-router.post('/', (req, res) => res.json(ds.create(req.body)));
+function decrementById( id ){
+  let counter = getById(id);
+  counter.count--;
+  return counter;
+}
 
-router.get('/:id', (req, res) => res.json(ds.getById(req.params.id)));
+function create( counter ){
+  if( getById(counter.id) ){
+    return false;
+  }
 
-router.get('/:id/increment', (req, res) => res.json(ds.incrementById(req.params.id)));
+  data[counter.id] = {
+    count : counter.count
+  };
 
-router.get('/:id/decrement', (req, res) => res.json(ds.decrementById(req.params.id)));
+  return data[counter.id];
+}
 
-router.put('/:id', (req, res) => res.json(ds.updateById(req.params.id, req.body)));
+function updateById( id, payload ){
+  let counter = getById(id);
 
+  if( !counter ){
+    return false;
+  }
 
-module.exports = router;
+  counter.count = payload.count;
+
+  return counter;
+}
+
+module.exports = (()=> ({
+  data,
+  getById,
+  incrementById,
+  decrementById,
+  create,
+  updateById
+}))();
