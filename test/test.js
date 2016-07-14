@@ -145,4 +145,39 @@ describe('Counter App', () => {
     });
   });
 
+  describe('POST /api/counters', (should) => {
+
+    let currentCount;
+
+    beforeEach((setup) => {
+      currentCount = null;
+      agent.get('/api/counters/1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && ( currentCount = res.body.count ) )
+        .end(setup);
+    });
+
+    it('should create a new counter and set initial value', (done)=>{
+
+      let payload = {
+        id : 99,
+        count : 99
+      };
+
+      agent.post('/api/counters')
+        .send(payload)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => res.body.hasOwnProperty('count') && res.body.should.deepEqual( { count : payload.count } ) )
+        .end(() => {
+          agent.get(`/api/counters/${payload.id}`)
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect(res => res.body.hasOwnProperty('count') && ( res.body.count.should.equal( payload.count ) ) )
+            .end(done);
+        });
+    });
+  });
+
 });
