@@ -36,4 +36,31 @@ describe('Counter App', () => {
 
   });
 
+  describe('GET /api/counters/1', () => {
+
+    let response;
+
+    beforeEach((setup) => {
+      response = null;
+      agent.get('/api/counters/1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => response = res)
+        .end(setup);
+    });
+
+    it('should be a json object', ()=>{
+      response.body.should.not.be.an.instanceof(Array);
+    });
+
+    it('should have only one property', ()=>{
+      Object.keys(response.body).should.have.length(1);
+    });
+
+    it('should only have the "count" property', ()=>{
+      response.body.should.have.property('count');
+    });
+
+  });
+
 });
